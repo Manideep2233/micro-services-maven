@@ -1,5 +1,6 @@
 package com.manideep.inventoryservice.service;
 
+import com.manideep.inventoryservice.dto.StockAvailabilityResponse;
 import com.manideep.inventoryservice.dto.StockInput;
 import com.manideep.inventoryservice.model.Inventory;
 import com.manideep.inventoryservice.repository.InventoryRepo;
@@ -7,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,4 +39,18 @@ public class InventoryService {
             return "New Product added to Inventory";
         }
     }
+
+
+
+    public List<StockAvailabilityResponse> getAvailabilityInfo(List<String> skuCodes){
+        System.out.println(skuCodes);
+        List<Inventory> inventoryList = inventoryRepo.findBySkuCodeIn(skuCodes);
+        System.out.println(inventoryList.size());
+        return inventoryList.stream().map(inventory -> StockAvailabilityResponse.builder()
+                .skuCode(inventory.getSkuCode())
+                .isPresent(inventory.getQuantity()>0)
+                .build()
+        ).toList();
+    }
+
 }

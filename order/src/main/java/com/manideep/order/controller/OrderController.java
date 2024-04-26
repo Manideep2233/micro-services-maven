@@ -17,11 +17,20 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/placeOrder")
-    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest input){
-        return new ResponseEntity<>(
-                orderService.placeOrder(input),
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest input) throws Exception {
+       try {
+           return new ResponseEntity<>(
+                   orderService.placeOrder(input),
+                   HttpStatus.CREATED
+           );
+       }
+       catch (Exception ex){
+           return new ResponseEntity<>(
+                  ex.getMessage(),
+                   HttpStatus.BAD_REQUEST
+           );
+       }
+
     }
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllOrders(){
