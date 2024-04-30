@@ -22,7 +22,7 @@ public class OrderService {
     private OrderRepo orderRepo;
 
     @Autowired
-    private WebClient webClient;
+    private WebClient.Builder webClientBuilder;
 
     public String placeOrder(OrderRequest input) throws Exception {
 
@@ -32,8 +32,8 @@ public class OrderService {
 
        // using webClient for communication
         System.out.println(codes);
-        StockAvailabilityResponse[] inventoryResponseArray = webClient.get()
-                .uri("http://localhost:9093/api/inventory/getAvailabilityInfo",
+        StockAvailabilityResponse[] inventoryResponseArray = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/inventory/getAvailabilityInfo",
                         uriBuilder -> uriBuilder.queryParam("skuCodes",codes).build())
                 .retrieve()
                 .bodyToMono(StockAvailabilityResponse[].class)
