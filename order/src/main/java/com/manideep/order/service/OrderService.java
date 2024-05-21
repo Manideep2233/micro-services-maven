@@ -4,10 +4,12 @@ package com.manideep.order.service;
 import com.manideep.order.dto.OrderItemsDto;
 import com.manideep.order.dto.OrderRequest;
 import com.manideep.order.dto.StockAvailabilityResponse;
+import com.manideep.order.event.OrderPlacedEvent;
 import com.manideep.order.model.Order;
 import com.manideep.order.repository.OrderRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -23,6 +25,9 @@ public class OrderService {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private KafkaTemplate<String,OrderPlacedEvent> kafkaTemplate;
 
     public String placeOrder(OrderRequest input){
 
@@ -54,10 +59,11 @@ public class OrderService {
                     ).toList();
 
             orderRepo.saveAll(items);
-
+            kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(on));
             // in real time situation, we can send a put request to update inventory,
 //             we don't need to wait for it's response.
             return "Order Placed Successfully";
+
         }
         else {
             throw new IllegalArgumentException("Product is not in stock, please try again later");
