@@ -24,7 +24,7 @@ public class OrderService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-    public String placeOrder(OrderRequest input) throws Exception {
+    public String placeOrder(OrderRequest input){
 
         // before placing the order we have to check if they are in inventory or not
        List<String> codes = input.getOrderItems()
@@ -60,7 +60,8 @@ public class OrderService {
             return "Order Placed Successfully";
         }
         else {
-            throw new Exception("All items are not present in the Inventory");
+            throw new IllegalArgumentException("Product is not in stock, please try again later");
+//            throw new Exception("All items are not present in the Inventory");
         }
 
 
